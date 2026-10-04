@@ -47,7 +47,7 @@ user_name = "notern"
 import gifos
 
 
-# Fix gifos paste_image to support RGBA alpha transparency
+# Fix paste_image to support RGBA alpha transparency
 def custom_paste_image(
     self,
     image_file: str,
@@ -91,6 +91,9 @@ AVATAR_FILE = "./assets/avatar.png"
 def main():
     # Terminal dimensions: 780x520
     t = gifos.Terminal(780, 520, 15, 15, FONT_FILE_BITMAP, 15)
+
+    # Clean custom prompt: notern@cachyos ~>
+    t.set_prompt("\x1b[0;92mnotern\x1b[0m@\x1b[0;94mcachyos \x1b[90m~>\x1b[0m ")
 
     year_now = datetime.now(ZoneInfo("Asia/Jakarta")).strftime("%Y")
     time_now = datetime.now(ZoneInfo("Asia/Jakarta")).strftime("%a %b %d %I:%M:%S %p %Z %Y")
