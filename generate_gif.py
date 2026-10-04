@@ -45,7 +45,6 @@ user_name = "notern"
 """)
 
 import gifos
-from gifos.utils import fetch_github_stats
 
 
 # Fix gifos paste_image to support RGBA alpha transparency
@@ -96,8 +95,8 @@ def main():
     year_now = datetime.now(ZoneInfo("Asia/Jakarta")).strftime("%Y")
     time_now = datetime.now(ZoneInfo("Asia/Jakarta")).strftime("%a %b %d %I:%M:%S %p %Z %Y")
 
-    # 1. BIOS boot phase
-    t.gen_text("", 1, count=10)
+    # 1. BIOS boot phase (minimal & sleek)
+    t.gen_text("", 1, count=8)
     t.toggle_show_cursor(False)
     t.gen_text("\x1b[96mNOTERN-BIOS (CachyOS Edition) v2.6.4\x1b[0m", 1)
     t.gen_text(f"Copyright (C) {year_now}, \x1b[31mNotern Systems\x1b[0m", 2)
@@ -111,8 +110,8 @@ def main():
         t.delete_row(7)
         t.gen_text(f"Memory Test: {i} KB", 7, contin=True)
     t.delete_row(7)
-    t.gen_text("Memory Test: 64MB OK", 7, count=8, contin=True)
-    t.gen_text("", 10, count=5, contin=True)
+    t.gen_text("Memory Test: 64MB OK", 7, count=6, contin=True)
+    t.gen_text("", 10, count=4, contin=True)
 
     # 2. Scramble logo boot
     t.clear_frame()
@@ -158,7 +157,7 @@ def main():
     t.clear_frame()
     t.gen_prompt(1)
     prompt_col = t.curr_col
-    t.clone_frame(5)
+    t.clone_frame(4)
     t.toggle_show_cursor(True)
     t.gen_typing_text("\x1b[91mfetch.s", 1, contin=True)
     t.delete_row(1, prompt_col)
@@ -173,47 +172,24 @@ def main():
     if os.path.exists(AVATAR_FILE):
         t.paste_image(AVATAR_FILE, 3, 2, size_multiplier=0.52)
 
-    # Fetch live stats or fallback
-    gh_token = os.getenv("GITHUB_TOKEN")
-    stars = "17"
-    commits = "3,600+"
-    prs = "25"
-    top_langs = "Java, C, TypeScript, Python"
-    rank = "A"
-
-    if gh_token:
-        try:
-            stats = fetch_github_stats("zaincyty")
-            stars = str(stats.total_stargazers)
-            commits = f"{stats.total_commits_last_year:,}"
-            prs = str(stats.total_pull_requests_made)
-            rank = stats.user_rank.level
-            if stats.languages_sorted:
-                top_langs = ", ".join([l[0] for l in stats.languages_sorted[:4]])
-        except Exception as e:
-            print("Notice: fetch_github_stats error, using defaults:", e)
-
-    fetch_lines = f"""\x1b[30;46m notern@cachyos \x1b[0m
+    fetch_lines = """\x1b[30;46m notern@cachyos \x1b[0m
 \x1b[90m--------------------------------------------------\x1b[0m
 \x1b[96mOS:        \x1b[97mCachyOS Linux x86_64\x1b[0m
 \x1b[96mWM:        \x1b[97mHyprland (Wayland)\x1b[0m
-\x1b[96mTerminal:  \x1b[97mAlacritty + Zsh (p10k)\x1b[0m
-\x1b[96mFocus:     \x1b[93mJava · C · Low-Level Systems\x1b[0m
-\x1b[96mDomain:    \x1b[95mCybersecurity & Network Engineering\x1b[0m
-\x1b[96mSecurity:  \x1b[92mEmbedded Security · Reverse Engineering\x1b[0m
+\x1b[96mShell:     \x1b[97mzsh 5.9 (p10k)\x1b[0m
+\x1b[96mEditor:    \x1b[97mNeovim\x1b[0m
 
-\x1b[30;45m Contact \x1b[0m
+\x1b[30;45m Focus Areas \x1b[0m
+\x1b[90m--------------------------------------------------\x1b[0m
+\x1b[96mLanguages: \x1b[93mJava · C\x1b[0m
+\x1b[96mDomain:    \x1b[95mCybersecurity & Network Engineering\x1b[0m
+\x1b[96mSecurity:  \x1b[92mLow-Level & Embedded Security\x1b[0m
+
+\x1b[30;44m Contact \x1b[0m
 \x1b[90m--------------------------------------------------\x1b[0m
 \x1b[96mLinkedIn:  \x1b[94mzainul-mutaqin\x1b[0m
 \x1b[96mPortfolio: \x1b[94mzainulmutaqin.vercel.app\x1b[0m
-\x1b[96mEmail:     \x1b[94makuzainul176@gmail.com\x1b[0m
-
-\x1b[30;43m GitHub Stats \x1b[0m
-\x1b[90m--------------------------------------------------\x1b[0m
-\x1b[96mRating:    \x1b[92mRank {rank}\x1b[0m
-\x1b[96mCommits:   \x1b[97m{commits}\x1b[0m (last year)
-\x1b[96mStars:     \x1b[97m{stars}\x1b[0m  |  \x1b[96mPRs: \x1b[97m{prs}\x1b[0m
-\x1b[96mLanguages: \x1b[93m{top_langs}\x1b[0m"""
+\x1b[96mEmail:     \x1b[94makuzainul176@gmail.com\x1b[0m"""
 
     text_col = 25  # Right next to avatar
     t.gen_text(fetch_lines, 2, text_col, count=5, contin=True)
@@ -221,7 +197,7 @@ def main():
     t.gen_prompt(t.curr_row)
     t.toggle_show_cursor(True)
     t.gen_typing_text(
-        "\x1b[92m# \"Talk is cheap. Show me the code.\" // Close to the metal\x1b[0m",
+        "\x1b[90m# ready.\x1b[0m",
         t.curr_row,
         contin=True,
     )

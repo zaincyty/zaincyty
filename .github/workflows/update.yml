@@ -33,8 +33,6 @@ jobs:
 
       - name: Generate terminal GIF
         run: python generate_gif.py
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Commit and push updated GIF
         run: |
