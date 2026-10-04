@@ -1,7 +1,9 @@
 import os
 from datetime import datetime
+from math import ceil
 from pathlib import Path
 from zoneinfo import ZoneInfo
+from PIL import Image
 
 # 1. Setup local / user config for Catppuccin Frappe
 config_dir = Path.home() / ".config" / "gifos"
@@ -45,13 +47,50 @@ user_name = "notern"
 import gifos
 from gifos.utils import fetch_github_stats
 
+
+# Fix gifos paste_image to support RGBA alpha transparency
+def custom_paste_image(
+    self,
+    image_file: str,
+    row_num: int,
+    col_num: int = 1,
+    size_multiplier: float = 1,
+) -> None:
+    x1, y1, _, _ = self.cursor_to_box(row_num, col_num, 1, 1, True, True)
+    with Image.open(image_file) as image:
+        image_width, image_height = image.size
+        image = image.resize(
+            (
+                int(image_width * size_multiplier),
+                int(image_height * size_multiplier),
+            ),
+            Image.Resampling.LANCZOS,
+        )
+        font_h = getattr(self, "_Terminal__font_height")
+        line_s = getattr(self, "_Terminal__line_spacing")
+        font_w = getattr(self, "_Terminal__font_width")
+        rows_covered = ceil(image.height / (font_h + line_s))
+        cols_covered = ceil(image.width / font_w) + 1
+        col_in_row = getattr(self, "_Terminal__col_in_row")
+        for i in range(rows_covered):
+            col_in_row[row_num + i] = cols_covered
+        self.image_col = col_num + cols_covered
+        frame = getattr(self, "_Terminal__frame")
+        mask = image if image.mode == "RGBA" else None
+        frame.paste(image, (x1, y1), mask=mask)
+        gen_frame = getattr(self, "_Terminal__gen_frame")
+        gen_frame(frame)
+
+
+gifos.Terminal.paste_image = custom_paste_image
+
 FONT_FILE_LOGO = "./fonts/vtks-blocketo.regular.ttf"
 FONT_FILE_BITMAP = "./fonts/ter-u14n.pil"
 AVATAR_FILE = "./assets/avatar.png"
 
 
 def main():
-    # Terminal dimensions: 780x520 (optimized 3:2 ratio)
+    # Terminal dimensions: 780x520
     t = gifos.Terminal(780, 520, 15, 15, FONT_FILE_BITMAP, 15)
 
     year_now = datetime.now(ZoneInfo("Asia/Jakarta")).strftime("%Y")
@@ -130,7 +169,7 @@ def main():
     t.clear_frame()
     t.toggle_show_cursor(False)
 
-    # Paste pixel ghost avatar on the left
+    # Paste pixel ghost avatar seamlessly on the left
     if os.path.exists(AVATAR_FILE):
         t.paste_image(AVATAR_FILE, 3, 2, size_multiplier=0.52)
 
